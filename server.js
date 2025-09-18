@@ -1,3 +1,4 @@
+// server.local.js
 import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
@@ -12,16 +13,16 @@ dotenv.config();
 
 const app = express();
 
-// ✅ Middlewares
+// Middlewares
 app.use(
   cors({
-    origin: "https://forfrontend-mzzt.vercel.app", // frontend live link
+    origin: "http://localhost:5173", // local frontend
     credentials: true,
   })
 );
 app.use(express.json());
 
-// ✅ Routes
+// Routes
 app.use("/api/admin", adminRoutes);
 app.use("/api/teachers", teacherRoutes);
 app.use("/api/student", studentRoutes);
@@ -31,16 +32,18 @@ app.get("/", (req, res) => {
   res.json({ activeStatus: true, error: false });
 });
 
-// ✅ Database connect only once
-if (!mongoose.connection.readyState) {
-  mongoose
-    .connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    })
-    .then(() => console.log("✅ MongoDB connected"))
-    .catch((err) => console.error("❌ DB connection error:", err));
-}
-
-// ✅ Export app (⚠️ no app.listen for Vercel)
-export default app;
+// Connect DB and start server
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log("✅ MongoDB connected");
+    app.listen(process.env.PORT || 5000, () => {
+      console.log(
+        `🚀 Server running on http://localhost:${process.env.PORT || 5000}`
+      );
+    });
+  })
+  .catch((err) => console.error("❌ DB connection error:", err));
