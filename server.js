@@ -1,11 +1,11 @@
 import dotenv from "dotenv";
 import express from "express";
-import connectDB from "./utils/db.js";
+import connectDB from "./src/utils/db.js";
 
-import adminRoutes from "./routes/admin.js";
-import teacherRoutes from "./routes/teacher.js";
-import studentRoutes from "./routes/student.js";
-import appointmentRoutes from "./routes/appointment.js";
+import adminRoutes from "./src/routes/admin.js";
+import teacherRoutes from "./src/routes/teacher.js";
+import studentRoutes from "./src/routes/student.js";
+import appointmentRoutes from "./src/routes/appointment.js";
 
 dotenv.config();
 
