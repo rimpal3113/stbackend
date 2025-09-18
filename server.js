@@ -1,4 +1,4 @@
-// backend/src/server.local.js
+// backend/src/server.js
 import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
@@ -16,7 +16,7 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: "http://localhost:5173", // frontend running locally
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
     credentials: true,
   })
 );
@@ -28,23 +28,22 @@ app.use("/api/teachers", teacherRoutes);
 app.use("/api/student", studentRoutes);
 app.use("/api/appointments", appointmentRoutes);
 
-// Health check endpoint
+// Health check
 app.get("/", (req, res) => {
   res.json({ activeStatus: true, error: false, message: "Server is running" });
 });
 
-// Connect to MongoDB and start server
-mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    console.log("✅ MongoDB connected");
-    app.listen(process.env.PORT || 5000, () => {
-      console.log(
-        `🚀 Server running on http://localhost:${process.env.PORT || 5000}`
-      );
-    });
-  })
-  .catch((err) => console.error("❌ DB connection error:", err));
+// Connect to MongoDB only once
+if (!mongoose.connection.readyState) {
+  mongoose
+    .connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    })
+    .then(() => console.log("✅ MongoDB connected"))
+    .catch((err) => console.error("❌ DB connection error:", err));
+}
+
+// ❌ No app.listen() here
+// ✅ Export for serverless (Vercel/Netlify)
+export default app;
