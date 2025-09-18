@@ -25,13 +25,14 @@ app.get("/", (req, res) => {
 // Connect to MongoDB once at cold start
 if (!mongoose.connection.readyState) {
   mongoose
-    .connect(process.env.MONGO_URI, {
+    .connect("mongodb://localhost:27017/student-teacher-booking", {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     })
     .then(() => console.log("✅ MongoDB connected"))
     .catch((err) => console.error("❌ DB connection error:", err));
 }
+
 
 // Export app for Vercel
 export default app;
