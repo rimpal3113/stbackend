@@ -1,54 +1,41 @@
-// server.js
 import express from "express";
 import mongoose from "mongoose";
-import cors from "cors";
 import dotenv from "dotenv";
+import cors from "cors";
 
-// Import routes
+// ✅ Correct imports
+import authRoutes from "./src/routes/auth.js";
 import adminRoutes from "./src/routes/admin.js";
 import teacherRoutes from "./src/routes/teacher.js";
 import studentRoutes from "./src/routes/student.js";
 import appointmentRoutes from "./src/routes/appointment.js";
-import authRoutes from "./src/routes/auth.js";
 
 dotenv.config();
 
 const app = express();
-
-// Middleware
-app.use(
-  cors({
-     origin: "https://stu-teacher-orpin.vercel.app",
-    credentials: true,
-  })
-);
 app.use(express.json());
+app.use(cors());
 
-// ✅ Connect to MongoDB *before routes*
-const connectDB = async () => {
-  try {
-    await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log("✅ MongoDB connected successfully");
-  } catch (error) {
-    console.error("❌ MongoDB connection failed:", error.message);
-  }
-};
-await connectDB();
-
-// ✅ Routes
-app.use("/api/auth", authRoutes); 
+// ✅ Mount routes
+app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/teachers", teacherRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/appointments", appointmentRoutes);
 
-// ✅ Health check
+// ✅ Root test route
 app.get("/", (req, res) => {
-  res.json({ message: "Backend is active", status: "✅ running" });
+  res.send("Server running successfully 🚀");
 });
 
-// ✅ Export for Vercel
+// ✅ MongoDB connection
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("MongoDB connection error:", err));
+
+// ✅ Local server (Vercel ignores this when deployed)
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
 export default app;
