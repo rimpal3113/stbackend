@@ -4,13 +4,16 @@ import Appointment from '../models/Appointment.js';
 import Message from "../models/Message.js";
 export const getAllTeachers = async (req, res) => {
   try {
-    const teachers = await Teacher.find(); // ✅ Should return array
+    const teachers = await Teacher.find();
+    console.log("📦 Teachers found:", teachers.length);
     res.json(teachers);
-  } catch (err) {
-    console.error("Error fetching teachers:", err);
-    res.status(500).json({ message: "Server error" });
+  } catch (error) {
+    console.error("❌ getAllTeachers Error:", error.message);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+
 
 // Approve an appointment
 export const approveAppointment = async (req, res) => {
